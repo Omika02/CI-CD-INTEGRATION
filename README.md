@@ -84,9 +84,13 @@ The setup uses a simple Python project (`src/calculator.py`) with unit tests (`t
 ## 🔹 Benefits
 
 ✅ Automated and repeatable testing
+
 ✅ Early detection of bugs
+
 ✅ Reports for better debugging & tracking
+
 ✅ Works with both GitHub Actions & Jenkins
+
 ✅ Scalable for real-world projects
 
 ## 🔹 Conclusion
