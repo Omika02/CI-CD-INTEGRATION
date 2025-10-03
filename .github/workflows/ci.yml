@@ -1,0 +1,63 @@
+name: CI - pytest
+
+
+on:
+push:
+pull_request:
+
+
+jobs:
+test:
+runs-on: ubuntu-latest
+strategy:
+matrix:
+python-version: ['3.9', '3.10', '3.11']
+
+
+steps:
+- uses: actions/checkout@v4
+
+
+- name: Set up Python
+uses: actions/setup-python@v4
+with:
+python-version: ${{ matrix.python-version }}
+
+
+- name: Cache pip
+uses: actions/cache@v4
+with:
+path: ~/.cache/pip
+key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+
+- name: Install dependencies
+run: |
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+
+- name: Run tests
+env:
+CI: true
+run: |
+mkdir -p reports
+pytest --maxfail=1 --disable-warnings -q \
+--junitxml=reports/junit-${{ matrix.python-version }}.xml \
+--html=reports/report-${{ matrix.python-version }}.html --self-contained-html \
+--cov=src --cov-report=xml:reports/coverage-${{ matrix.python-version }}.xml
+
+
+- name: Upload test artifacts
+uses: actions/upload-artifact@v4
+with:
+name: pytest-reports-${{ matrix.python-version }}
+path: reports/
+
+
+- name: Upload coverage to Codecov (optional)
+if: success()
+uses: codecov/codecov-action@v4
+with:
+files: reports/coverage-*.xml
+token: ${{ secrets.CODECOV_TOKEN }}
